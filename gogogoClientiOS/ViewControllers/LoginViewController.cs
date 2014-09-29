@@ -4,17 +4,17 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.ViewControllers
 {
-	public class LoginViewController : UIViewController
+	public sealed class LoginViewController : UIViewController
 	{
 		private UIView _contentView;
 		private UIScrollView _scrollView;
-		private float _keyboardOffset = 0;
+		private float _keyboardOffset;
 
 		public LoginViewController ()
 		{
-			this.Title = "Авторизация";
+			Title = "Авторизация";
 			//This hides the back button text when you leave this View Controller
-			this.NavigationItem.BackBarButtonItem = new UIBarButtonItem ("", UIBarButtonItemStyle.Plain, handler: null);
+			NavigationItem.BackBarButtonItem = new UIBarButtonItem ("", UIBarButtonItemStyle.Plain, handler: null);
 			AutomaticallyAdjustsScrollViewInsets = false;
 		}
 

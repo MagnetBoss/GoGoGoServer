@@ -1,20 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gogogoserver", "gogogoserver", "{F6C0526E-9FE6-4B07-B340-243315E431F1}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "gogogoserver.Shared", "gogogoserver\gogogoserver.Shared\gogogoserver.Shared.shproj", "{1BBA7382-395F-44D1-9431-813384EAB491}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gogogoserverService", "gogogoserverService\gogogoserverService.csproj", "{209FA716-A7AD-4095-BD70-C8710FC66FA7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gogogoClientiOS", "gogogoClientiOS\gogogoClientiOS.csproj", "{D411DBA6-D7D9-441B-9639-10B5E70B6687}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A1AAC216-089A-473F-B8E9-DFBC32075203}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelperProject", "HelperProject\HelperProject.csproj", "{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		gogogoserver\gogogoserver.Shared\gogogoserver.Shared.projitems*{1bba7382-395f-44d1-9431-813384eab491}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
 		Ad-Hoc|ARM = Ad-Hoc|ARM
@@ -108,8 +110,8 @@ Global
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|iPhone.Build.0 = Debug|iPhone
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|Mixed Platforms.ActiveCfg = Debug|iPhone
-		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|Mixed Platforms.Build.0 = Debug|iPhone
+		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|Mixed Platforms.ActiveCfg = Debug|iPhoneSimulator
+		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|Mixed Platforms.Build.0 = Debug|iPhoneSimulator
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|x64.ActiveCfg = Debug|iPhone
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Debug|x86.ActiveCfg = Debug|iPhone
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Release|Any CPU.ActiveCfg = Release|iPhone
@@ -122,12 +124,50 @@ Global
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Release|Mixed Platforms.Build.0 = Release|iPhone
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Release|x64.ActiveCfg = Release|iPhone
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687}.Release|x86.ActiveCfg = Release|iPhone
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|Any CPU.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|ARM.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|iPhone.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|Mixed Platforms.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|x64.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Ad-Hoc|x86.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|Any CPU.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|ARM.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|iPhone.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|Mixed Platforms.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|x64.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.AppStore|x86.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|ARM.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|x64.ActiveCfg = Release|Any CPU
+		{5BC18E0B-E8BE-4BE4-AC06-8CF6D7E30B5D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1BBA7382-395F-44D1-9431-813384EAB491} = {F6C0526E-9FE6-4B07-B340-243315E431F1}
 		{D411DBA6-D7D9-441B-9639-10B5E70B6687} = {F6C0526E-9FE6-4B07-B340-243315E431F1}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		gogogoserver\gogogoserver.Shared\gogogoserver.Shared.projitems*{1bba7382-395f-44d1-9431-813384eab491}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

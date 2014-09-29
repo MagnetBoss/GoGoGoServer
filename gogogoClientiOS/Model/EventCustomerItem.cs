@@ -1,4 +1,6 @@
-﻿namespace gogogoClientiOS.Model
+﻿using Newtonsoft.Json;
+
+namespace gogogoClientiOS.Model
 {
 	public class EventCustomerItem : BaseItem
 	{

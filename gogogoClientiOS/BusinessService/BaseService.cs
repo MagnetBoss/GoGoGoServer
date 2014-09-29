@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Threading.Tasks;
 using gogogoClientiOS.Model;
 using gogogoClientiOS.Model.Messages;
+using Microsoft.WindowsAzure.MobileServices;
 
 namespace gogogoClientiOS.BusinessService
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -12,30 +13,35 @@ namespace gogogoserverService.Controllers
 {
     public class ParticipantItemController : TableController<ParticipantItem>
     {
+        private gogogoserverContext _dataContext;
         protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
-            var context = new gogogoserverContext();
-            DomainManager = new EntityDomainManager<ParticipantItem>(context, Request, Services);
+            _dataContext = new gogogoserverContext();
+            DomainManager = new EntityDomainManager<ParticipantItem>(_dataContext, Request, Services);
         }
 
-        public static readonly Func<ParticipantItem, ParticipantItemDto> ConvertToDtoExpression = participantItem => new ParticipantItemDto
+        public static readonly Expression<Func<ParticipantItem, ParticipantItemDto>> ConvertToDtoExpression = participantItem => new ParticipantItemDto
         {
             Id = participantItem.Id,
             Name = participantItem.Name,
-            Version = participantItem.Version
+            Version = participantItem.Version,
+            Image = participantItem.Image,
         };
 
         // GET tables/ParticipantItem
-        public IQueryable<ParticipantItemDto> GetAllParticipantItem()
+        public IQueryable<ParticipantItemDto> GetAllParticipantItem([FromUri] string eventId)
         {
-            return Query().Select(participantItem => ConvertToDtoExpression(participantItem)); 
+            //указываем eventId, т.к. хотим получить участников, идущих на событие с id == eventId
+            if (string.IsNullOrEmpty(eventId))
+                return null;
+            return Query().Where(x => x.EventItems.Any(y => y.Id == eventId)).Select(ConvertToDtoExpression);
         }
 
         // GET tables/ParticipantItem/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public SingleResult<ParticipantItemDto> GetParticipantItem(string id)
         {
-            return SingleResult.Create(Lookup(id).Queryable.Select(participantItem => ConvertToDtoExpression(participantItem)));
+            return SingleResult.Create(Lookup(id).Queryable.Select(ConvertToDtoExpression));
         }
 
         // PATCH tables/ParticipantItem/48D68C86-6EA6-4C25-AA33-223FC9A27959

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -20,43 +20,34 @@ namespace gogogoserverService.Controllers
             DomainManager = new EntityDomainManager<EventItem>(context, Request, Services);
         }
 
-        public static readonly Func<EventItem, EventItemDto> ConvertToDtoExpression = eventItem => new EventItemDto
+        public static readonly Expression<Func<EventItem, EventItemDto>>  ConvertToDtoExpression = eventItem => new EventItemDto
         {
             Id = eventItem.Id,
             Name = eventItem.Name,
             Description = eventItem.Description,
+            SmallDescription = eventItem.SmallDescription,
             Date = eventItem.Date,
             Version = eventItem.Version,
             ShortImage = eventItem.ShortImage,
             LargeImage = eventItem.LargeImage,
             MaxParticipantsCount = eventItem.MaxParticipantsCount,
             MinParticipantsCount = eventItem.MinParticipantsCount,
-            Participants =
-                eventItem.ParticipantItems.Select(
-                    participantItem => ParticipantItemController.ConvertToDtoExpression(participantItem)).ToList(),
-            Place = eventItem.PlaceItem != null
-                ? new PlaceItemDto
-                {
-                    Id = eventItem.PlaceItem.Id,
-                    Description = eventItem.PlaceItem.Description,
-                    Latitude = eventItem.PlaceItem.Latitude,
-                    Longitude = eventItem.PlaceItem.Longitude,
-                    Title = eventItem.PlaceItem.Title,
-                    Version = eventItem.PlaceItem.Version
-                }
-                : null
+            PlaceDescription = eventItem.PlaceItem != null ? eventItem.PlaceItem.Description : null,
+            PlaceLatitude = eventItem.PlaceItem != null ? eventItem.PlaceItem.Latitude : 0,
+            PlaceLongitude = eventItem.PlaceItem != null ? eventItem.PlaceItem.Longitude : 0,
+            PlaceTitle = eventItem.PlaceItem != null ? eventItem.PlaceItem.Title : null,
         };
 
         // GET tables/EventItem
         public IQueryable<EventItemDto> GetAllEventItem()
         {
-            return Query().Include(eventItem => eventItem.ParticipantItems).Include(eventItem => eventItem.PlaceItem).Select(eventItem => ConvertToDtoExpression(eventItem));
+            return Query().Select(ConvertToDtoExpression);
         }
 
         // GET tables/EventItem/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public SingleResult<EventItemDto> GetEventItem(string id)
         {
-            return SingleResult.Create(Lookup(id).Queryable.Include(eventItem => eventItem.ParticipantItems).Include(eventItem => eventItem.PlaceItem).Select(eventItem => ConvertToDtoExpression(eventItem)));
+            return SingleResult.Create(Lookup(id).Queryable.Select(ConvertToDtoExpression));
         }
 
         // PATCH tables/EventItem/48D68C86-6EA6-4C25-AA33-223FC9A27959

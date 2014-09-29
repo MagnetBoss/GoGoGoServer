@@ -40,11 +40,8 @@ namespace gogogoserverService.Models
                 .HasMany(eventItem => eventItem.ParticipantItems)
                 .WithMany(participant => participant.EventItems);
             modelBuilder.Entity<EventItem>()
-                .HasMany(eventItem => eventItem.CommentItems)
-                .WithRequired(commentItem => commentItem.EventItem);
-            modelBuilder.Entity<EventItem>()
-                .HasOptional<PlaceItem>(eventItem => eventItem.PlaceItem)
-                .WithRequired(placeItem => placeItem.EventItem);
+                .HasOptional(eventItem => eventItem.PlaceItem)
+                .WithMany(placeItem => placeItem.EventItems);
         }
 
         public System.Data.Entity.DbSet<gogogoserverService.DataObjects.EventItem> EventItems { get; set; }

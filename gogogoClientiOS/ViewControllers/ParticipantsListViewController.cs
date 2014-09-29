@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Caliburn.Micro;
-using gogogoClientiOS.BusinessService;
+﻿using System.Collections.Generic;
+using System.Linq;
 using gogogoClientiOS.Model;
-using gogogoClientiOS.Model.Messages;
 using gogogoClientiOS.Tools;
 using gogogoClientiOS.Views;
 using MonoTouch.Foundation;
@@ -11,13 +8,15 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.ViewControllers
 {
-	public class ParticipantsListViewController : UITableViewController, IHandle<ItemsChangedMessage<EventItem>>
+	public sealed class ParticipantsListViewController : UITableViewController
 	{
-		public List<CustomerItem> ParticipantItems { get; private set; } 
+		public List<ParticipantItem> ParticipantItems { get; private set; } 
 
-		public ParticipantsListViewController ()
+		public ParticipantsListViewController (List<ParticipantItem> participantItems)
 		{
-			ParticipantItems = new List<CustomerItem> ();
+		    ParticipantItems = new List<ParticipantItem>();
+            if (participantItems != null && participantItems.Any())
+                ParticipantItems.AddRange(participantItems);
 
 			AppDelegate.Shared.Messenger.Subscribe (this);
 
@@ -25,42 +24,16 @@ namespace gogogoClientiOS.ViewControllers
 			TableView.Source = new ParticipantsListTableSource (this);
 		}
 
-		public virtual new void Handle(ItemsChangedMessage<EventItem> message)
-		{
-			InvokeOnMainThread (() => {
-				Refresh ();
-			});
-		}
-
 		public override void LoadView ()
 		{
 			base.LoadView ();
 			View.BackgroundColor = UIColor.White;
 		}
-
-		public override void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
-			Refresh ();
-		}
-
-		private void Refresh ()
-		{
-			try {
-				ParticipantItems.Clear ();
-
-				ParticipantItems.AddRange (ParticipantService.GetInstance ().GetItems ());
-				TableView.ReloadData ();
-			} catch (Exception ex)
-			{
-
-			}
-		}
 	}
 
 	public class ParticipantsListTableSource : UITableViewSource {
-		string cellIdentifier = "ParticipantTableCell";
-		private ParticipantsListViewController _parentController;
+	    private const string CellIdentifier = "ParticipantTableCell";
+	    private readonly ParticipantsListViewController _parentController;
 		public ParticipantsListTableSource (ParticipantsListViewController parentController)
 		{
 			_parentController = parentController;
@@ -70,15 +43,13 @@ namespace gogogoClientiOS.ViewControllers
 			return _parentController.ParticipantItems.Count;
 		}
 
-		public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			ParticipantCellView cell = tableView.DequeueReusableCell (cellIdentifier) as ParticipantCellView;
+			var cell = tableView.DequeueReusableCell (CellIdentifier) as ParticipantCellView ??
+			           new ParticipantCellView (CellIdentifier);
 
-			if (cell == null) {
-				cell = new ParticipantCellView (cellIdentifier);
-			}
-			var participant = indexPath.Row < _parentController.ParticipantItems.Count ?
-				_parentController.ParticipantItems [indexPath.Row] : CustomerItem.NullCustomer ();
+		    var participant = indexPath.Row < _parentController.ParticipantItems.Count ?
+				_parentController.ParticipantItems [indexPath.Row] : ParticipantItem.NullCustomer ();
 			cell.UpdateCell (participant.Name, Converters.FromBase64 (participant.Image));
 
 			return cell;

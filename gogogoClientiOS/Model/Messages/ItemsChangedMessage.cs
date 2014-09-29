@@ -6,7 +6,7 @@ namespace gogogoClientiOS.Model.Messages
 	public class ItemsChangedMessage<T>
 		where T : BaseItem
 	{
-		private List<T> _items;
+		private readonly List<T> _items;
 		public List<T> Items {
 			get {
 				return _items;
@@ -23,7 +23,7 @@ namespace gogogoClientiOS.Model.Messages
 	public class ItemsAddedMessage<T>
 		where T : BaseItem
 	{
-		private List<T> _items;
+		private readonly List<T> _items;
 		public List<T> Items {
 			get {
 				return _items;
@@ -40,7 +40,7 @@ namespace gogogoClientiOS.Model.Messages
 	public class ItemsDeletedMessage<T>
 		where T : BaseItem
 	{
-		private List<T> _items;
+		private readonly List<T> _items;
 		public List<T> Items {
 			get {
 				return _items;

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using Caliburn.Micro;
+using System.Threading.Tasks;
 using gogogoClientiOS.BusinessService;
 using gogogoClientiOS.Model;
-using gogogoClientiOS.Model.Messages;
 using gogogoClientiOS.Tools;
 using gogogoClientiOS.Views;
 using MonoTouch.Foundation;
@@ -13,13 +12,15 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.ViewControllers
 {
-	public class CommentsListViewController : UITableViewController, IHandle<ItemsChangedMessage<CommentItem>>, IHandle<ItemsChangedMessage<CustomerItem>>
-	{
-		public List<CommentItem> CommentItems { get; private set; } 
+	public sealed class CommentsListViewController : UITableViewController
+    {
+	    private readonly string _eventId;
+	    public List<CommentItem> CommentItems { get; private set; } 
 
-		public CommentsListViewController ()
+		public CommentsListViewController (string eventId)
 		{
-			CommentItems = new List<CommentItem> ();
+		    _eventId = eventId;
+		    CommentItems = new List<CommentItem> ();
 
 			AppDelegate.Shared.Messenger.Subscribe (this);
 
@@ -27,58 +28,63 @@ namespace gogogoClientiOS.ViewControllers
 			TableView.Source = new CommentsListTableSource (this);
 		}
 
-		public virtual new void Handle(ItemsChangedMessage<CommentItem> message)
-		{
-			InvokeOnMainThread (() => {
-				Refresh ();
-			});
-		}
-
-
-		public virtual new void Handle(ItemsChangedMessage<CustomerItem> message)
-		{
-			var comments = CommentItems.ToList();
-			HashSet<NSIndexPath> changedRows = new HashSet<NSIndexPath> ();
-			for (int i = 0; i < comments.Count; ++i) {
-				var participant = message.Items.FirstOrDefault (item => item.Id == comments[i].CustomerId);
-				if (participant == null)
-					return;
-				changedRows.Add (NSIndexPath.FromRowSection(i, 0));
-			}
-
-			InvokeOnMainThread (() => {
-				TableView.ReloadRows(changedRows.ToArray(), UITableViewRowAnimation.None);
-			});
-		}
-
-		public override void LoadView ()
+        public override void LoadView ()
 		{
 			base.LoadView ();
 			View.BackgroundColor = UIColor.White;
 		}
 
-		public override void ViewDidLoad ()
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			Refresh ();
+            EventService.GetInstance().Init();
+            await EventService.GetInstance().InitializeStoreAsync();
+            await RefreshAsync();
+            AddRefreshControl();
 		}
 
-		void Refresh ()
-		{
-			try {
-				CommentItems.Clear ();
-				CommentItems.AddRange (CommentService.GetInstance ().GetItems ().OrderBy(comment => comment.Date).ToList());
-				TableView.ReloadData ();
-			} catch (Exception ex)
-			{
+        private void AddRefreshControl()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0)) return;
+            // the refresh control is available, let's add it
+            RefreshControl = new UIRefreshControl();
+            RefreshControl.ValueChanged += async (sender, e) =>
+            {
+                await RefreshAsync();
+            };
+        }
 
-			}
+        private bool _isLoading;
+        private async Task RefreshAsync()
+		{
+            if (_isLoading)
+                return;
+            _isLoading = true;
+            if (RefreshControl != null)
+                RefreshControl.BeginRefreshing();
+            try
+            {
+                await CommentService.GetInstance().SyncAsync();
+                CommentItems.Clear();
+                CommentItems.AddRange(await CommentService.GetInstance().GetItems());
+                TableView.ReloadData();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _isLoading = false;
+                if (RefreshControl != null)
+                    RefreshControl.EndRefreshing();
+            }
 		}
 	}
 
 	public class CommentsListTableSource : UITableViewSource {
-		string cellIdentifier = "CommentTableCell";
-		private CommentsListViewController _parentController;
+	    private const string CellIdentifier = "CommentTableCell";
+	    private readonly CommentsListViewController _parentController;
 		public CommentsListTableSource (CommentsListViewController parentController)
 		{
 			_parentController = parentController;
@@ -88,25 +94,22 @@ namespace gogogoClientiOS.ViewControllers
 			return _parentController.CommentItems.Count;
 		}
 
-		public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			CommentCellView cell = tableView.DequeueReusableCell (cellIdentifier) as CommentCellView;
+			var cell = tableView.DequeueReusableCell (CellIdentifier) as CommentCellView ?? new CommentCellView (CellIdentifier);
 
-			if (cell == null) {
-				cell = new CommentCellView (cellIdentifier);
-			}
-			var comment = indexPath.Row < _parentController.CommentItems.Count ?
+		    var comment = indexPath.Row < _parentController.CommentItems.Count ?
 				_parentController.CommentItems [indexPath.Row] : CommentItem.NullComment ();
 
-			CustomerItem participant;
+			/*ParticipantItem participant;
 			if (!string.IsNullOrEmpty (comment.CustomerId)) {
-				participant = ParticipantService.GetInstance ().GetItems ().FirstOrDefault (item => item.Id == comment.CustomerId) ?? CustomerItem.LoadingCustomer (comment.CustomerId);
+				participant = ParticipantService.GetInstance ().GetItems ().FirstOrDefault (item => item.Id == comment.CustomerId) ?? ParticipantItem.LoadingCustomer (comment.CustomerId);
 			} else {
-				participant = CustomerItem.NullCustomer ();
+				participant = ParticipantItem.NullCustomer ();
 			}
 
 			cell.UpdateCell (comment.Text, participant, Converters.FromBase64 (participant.Image));
-
+            */
 			return cell;
 		}
 
@@ -117,10 +120,10 @@ namespace gogogoClientiOS.ViewControllers
 
 		public override float GetHeightForRow (UITableView tableView, NSIndexPath indexPath)
 		{
-			var cell = new CommentCellView(cellIdentifier);
+			var cell = new CommentCellView(CellIdentifier);
 
 			var item = indexPath.Row < _parentController.CommentItems.Count ? _parentController.CommentItems [indexPath.Row] : CommentItem.NullComment ();
-			cell.UpdateCell (item.Text, CustomerItem.NullCustomer(), null);
+			cell.UpdateCell (item.Text, ParticipantItem.NullCustomer(), null);
 
 			cell.SetNeedsUpdateConstraints();
 			cell.UpdateConstraintsIfNeeded();

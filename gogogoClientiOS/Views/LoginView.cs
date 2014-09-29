@@ -3,15 +3,13 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.Views
 {
-	public class LoginView : UIView
+	public sealed class LoginView : UIView
 	{
-		private UIImageView _imageView;
-		private UIButton _loginButton;
+		private readonly UIImageView _imageView;
+		private readonly UIButton _loginButton;
 
 		public LoginView ()
 		{
-			BackgroundColor = UIColor.White;
-
 			Add (
 				_imageView = new UIImageView {
 					Image = UIImage.FromBundle ("login.png"),
@@ -23,9 +21,7 @@ namespace gogogoClientiOS.Views
 			_loginButton.SetTitle ("Войти", UIControlState.Normal);
 			_loginButton.BackgroundColor = UIColor.FromRGB (240, 240, 240);
 
-			_loginButton.TouchUpInside += (sender, e) => {
-				AppDelegate.Shared.ShowEventsList();
-			};
+			_loginButton.TouchUpInside += (sender, e) => AppDelegate.Shared.ShowEventsList();
 		}
 
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data.Entity;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -13,31 +11,43 @@ namespace gogogoserverService.Controllers
 {
     public class CommentItemController : TableController<CommentItem>
     {
+        private gogogoserverContext _context;
+
         protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
-            var context = new gogogoserverContext();
-            DomainManager = new EntityDomainManager<CommentItem>(context, Request, Services);
+            _context = new gogogoserverContext();
+            DomainManager = new EntityDomainManager<CommentItem>(_context, Request, Services);
         }
-
-        private static readonly Func<CommentItem, CommentItemDto> ConvertToDtoExpression = commentItem => new CommentItemDto
-        {
-            Id = commentItem.Id,
-            Text = commentItem.Text,
-            Version = commentItem.Version,
-            ParticipantItem = ParticipantItemController.ConvertToDtoExpression(commentItem.ParticipantItem)
-        };
 
         // GET tables/CommentItem
         public IQueryable<CommentItemDto> GetAllCommentItem()
         {
-            return Query().Include(commentItem => commentItem.ParticipantItem).Select(commentItem => ConvertToDtoExpression(commentItem)); 
+            return Query().Select(x => new CommentItemDto
+            {
+                Id = x.Id,
+                Version = x.Version,
+                ParticipantImage = x.ParticipantItem.Image,
+                ParticipantName = x.ParticipantItem.Name,
+                Text = x.Text,
+                ParticipantItemId = x.ParticipantItemId,
+                EventItemId = x.EventItemId
+            }); 
         }
 
         // GET tables/CommentItem/48D68C86-6EA6-4C25-AA33-223FC9A27959
         public SingleResult<CommentItemDto> GetCommentItem(string id)
         {
-            return SingleResult.Create(Lookup(id).Queryable.Include(commentItem => commentItem.ParticipantItem).Select(commentItem => ConvertToDtoExpression(commentItem)));
+            return SingleResult.Create(Lookup(id).Queryable.Select(x => new CommentItemDto
+            {
+                Id = x.Id,
+                Version = x.Version,
+                ParticipantImage = x.ParticipantItem.Image,
+                ParticipantName = x.ParticipantItem.Name,
+                Text = x.Text,
+                ParticipantItemId = x.ParticipantItemId,
+                EventItemId = x.EventItemId
+            }));
         }
 
         // PATCH tables/CommentItem/48D68C86-6EA6-4C25-AA33-223FC9A27959
@@ -60,4 +70,5 @@ namespace gogogoserverService.Controllers
         }
 
     }
+
 }

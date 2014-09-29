@@ -1,36 +1,35 @@
-﻿using System.Collections.Generic;
-using Caliburn.Micro;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using gogogoClientiOS.BusinessService.DesignMode;
 using gogogoClientiOS.Model;
+using Microsoft.WindowsAzure.MobileServices;
+using Microsoft.WindowsAzure.MobileServices.SQLiteStore;
+using Microsoft.WindowsAzure.MobileServices.Sync;
 
 namespace gogogoClientiOS.BusinessService
 {
-	public class ParticipantService : BaseService<CustomerItem>, IHandle<CurrentEventChangedMessage>
+	public class ParticipantService : DelegatingHandler
 	{
-		private static object _lock = new object();
+		private static readonly object Lock = new object();
 		private static volatile ParticipantService _instance;
+
+        protected const string ApplicationUrl = @"http://localhost:8083/";
+        protected const string ApplicationKey = @"XHXdlpQuMFvqNesQtABHmzvlTajanC93";
+
+        private IMobileServiceSyncTable<ParticipantItem> _table;
+        private MobileServiceClient _client;
 
 		protected ParticipantService ()
 		{
 			AppDelegate.Shared.Messenger.Subscribe (this);
 		}
-
-		public virtual void Handle(CurrentEventChangedMessage message)
-		{
-			if (message == null)
-				return;
-			if (message.CurrentEventItem == null || string.IsNullOrEmpty (message.CurrentEventItem.Id))
-				return;
-			var additionalParameters = new Dictionary<string, string> ();
-			additionalParameters.Add ("eventId", message.CurrentEventItem.Id);
-			SetAdditionalQueryParameters (additionalParameters);
-			SetModelIsDirty ();
-		}
-
+		
 		public static ParticipantService GetInstance() {
 			if (_instance != null)
 				return _instance;
-			lock (_lock) {
+			lock (Lock) {
 				if (_instance != null)
 					return _instance;
 				_instance = new ParticipantDesignService ();
@@ -39,17 +38,52 @@ namespace gogogoClientiOS.BusinessService
 			return _instance;
 		}
 
-		public virtual void Init()
-		{
-			CurrentPlatform.Init ();
+        private bool _startedIniting;
+        public void Init()
+        {
+            if (_startedIniting)
+                return;
+            _startedIniting = true;
+            CurrentPlatform.Init();
 
-			// Initialize the Mobile Service client with your URL and key
-			_client = new MobileServiceClient (applicationURL, applicationKey, _instance);
+            SQLitePCL.CurrentPlatform.Init();
 
-			// Create an MSTable instance to allow us to work with the TodoItem table
-			_table = _instance._client.GetTable <CustomerItem> ();
+            // Initialize the Mobile Service client with your URL and key
+            _client = new MobileServiceClient(ApplicationUrl, ApplicationKey, _instance);
 
-		}
+            // Create an MSTable instance to allow us to work with the TodoItem table
+            _table = _instance._client.GetSyncTable<ParticipantItem>();
+        }
+
+        public async Task<List<ParticipantItem>> GetItems()
+        {
+            return await _table.ToListAsync();
+        }
+
+        private bool _storeInitializing;
+        public async Task InitializeStoreAsync()
+        {
+            if (_storeInitializing)
+                return;
+            _storeInitializing = true;
+            const string path = "syncstore.db";
+            var store = new MobileServiceSQLiteStore(path);
+            store.DefineTable<EventItem>();
+            await _client.SyncContext.InitializeAsync(store);
+        }
+
+        public async Task SyncAsync()
+        {
+            try
+            {
+                await _client.SyncContext.PushAsync();
+                await _table.PullAsync();
+            }
+            catch (MobileServiceInvalidOperationException e)
+            {
+                Console.Error.WriteLine(@"Sync Failed: {0}", e.Message);
+            }
+        }
 	}
 }
 

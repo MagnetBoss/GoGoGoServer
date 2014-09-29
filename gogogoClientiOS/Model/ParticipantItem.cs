@@ -1,6 +1,8 @@
-﻿namespace gogogoClientiOS.Model
+﻿using Newtonsoft.Json;
+
+namespace gogogoClientiOS.Model
 {
-	public class CustomerItem : BaseItem
+	public class ParticipantItem : BaseItem
 	{
 		public string Id { get; set;}
 
@@ -10,16 +12,16 @@
 		[JsonProperty(PropertyName = "image")]
 		public string Image { get; set; }
 
-		public static CustomerItem NullCustomer()
+		public static ParticipantItem NullCustomer()
 		{
-			return new CustomerItem {
+			return new ParticipantItem {
 				Name = "",
 				Image = "" //TODO добавить нормальное изображение
 			};
 		}
 
-		public static CustomerItem LoadingCustomer(string customerId) {
-			return new CustomerItem {
+		public static ParticipantItem LoadingCustomer(string customerId) {
+			return new ParticipantItem {
 				Id = customerId,
 				Image = "" //TODO добавить изображение preloader
 			};

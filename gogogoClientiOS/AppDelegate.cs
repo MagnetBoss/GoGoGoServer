@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using gogogoClientiOS.BusinessService;
+using gogogoClientiOS.Model;
 using gogogoClientiOS.ViewControllers;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -11,14 +11,14 @@ namespace gogogoClientiOS
     // User Interface of the application, as well as listening (and optionally responding) to
     // application events from iOS.
     [Register("AppDelegate")]
-    public partial class AppDelegate : UIApplicationDelegate
+    public class AppDelegate : UIApplicationDelegate
     {
         public static AppDelegate Shared;
 
         private UIWindow _window;
         private UINavigationController _navigation;
 
-        private IEventAggregator _messenger = new EventAggregator();
+        private readonly IEventAggregator _messenger = new EventAggregator();
         public IEventAggregator Messenger
         {
             get
@@ -31,7 +31,6 @@ namespace gogogoClientiOS
         {
             Shared = this;
 
-            EventService.GetInstance().Init();
             CommentService.GetInstance().Init();
             ParticipantService.GetInstance().Init();
 
@@ -39,7 +38,7 @@ namespace gogogoClientiOS
 
             _window = new UIWindow(UIScreen.MainScreen.Bounds);
             //UINavigationBar.Appearance.SetTitleTextAttributes (new UITextAttributes {
-            //	TextColor = UIColor.Blue
+            // 	TextColor = UIColor.Blue
             //});
 
             var loginViewController = new LoginViewController();
@@ -56,18 +55,13 @@ namespace gogogoClientiOS
 
         public void ShowEventsList()
         {
-            EventService.GetInstance().SetModelIsDirty();
-
             var eventsListViewController = new EventsListViewController();
             _navigation.PushViewController(eventsListViewController, true);
         }
 
-        public void ShowEventDetails(string eventId)
+        public void ShowEventDetails(EventItem eventItem)
         {
-            var eventItem = EventService.GetInstance().GetItems().FirstOrDefault(item => item.Id == eventId);
-            EventService.GetInstance().SetCurrentEvent(eventItem);
             var eventTabBarController = new EventTabViewController(eventItem);
-
             _navigation.PushViewController(eventTabBarController, true);
         }
 

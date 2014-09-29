@@ -3,28 +3,30 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.Views
 {
-	public class EventCellView : UITableViewCell
+	public sealed class EventCellView : UITableViewCell
 	{
-		private UILabel _headingLabel, _subheadingLabel;
-		private UIImageView _imageView;
+		private readonly UILabel _headingLabel;
+	    private readonly UILabel _subheadingLabel;
+	    private readonly UIImageView _imageView;
 
 		public EventCellView (string cellId) : base (UITableViewCellStyle.Default, cellId)
 		{
 			SelectionStyle = UITableViewCellSelectionStyle.None;
-
 			_imageView = new UIImageView();
 
-			_headingLabel = new UILabel () {
-				BackgroundColor = UIColor.Clear,
-				TextColor = UIColor.White
+			_headingLabel = new UILabel
+			{
+			    BackgroundColor = UIColor.Clear,
+			    TextColor = UIColor.White,
+			    Font = UIFont.FromName("HelveticaNeue-Medium", 14f)
 			};
-			_headingLabel.Font = UIFont.FromName("HelveticaNeue-Medium", 14f);
-			_subheadingLabel = new UILabel () {
-				BackgroundColor = UIColor.Clear,
-				TextColor = UIColor.White
-			};
-			_subheadingLabel.Font = UIFont.FromName ("HelveticaNeue-Light", 13f);
-			ContentView.Add(_imageView);
+		    _subheadingLabel = new UILabel
+		    {
+		        BackgroundColor = UIColor.Clear,
+		        TextColor = UIColor.White,
+		        Font = UIFont.FromName("HelveticaNeue-Light", 13f)
+		    };
+		    ContentView.Add(_imageView);
 			ContentView.Add(_headingLabel);
 			ContentView.Add(_subheadingLabel);
 		}

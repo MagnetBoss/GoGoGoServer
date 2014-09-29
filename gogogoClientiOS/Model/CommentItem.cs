@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace gogogoClientiOS.Model
 {
@@ -20,13 +21,13 @@ namespace gogogoClientiOS.Model
 
 		public static CommentItem NullComment()
 		{
-			return new CommentItem () {
+			return new CommentItem
+			{
 				Text = "",
 				CustomerId = ""
 			};
 		}
 	}
-
 
 }
 

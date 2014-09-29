@@ -8,7 +8,7 @@ namespace gogogoClientiOS.Views
 	{
 		private UILabel _headingLabel, _subheadingLabel;
 		private UIImageView _imageView;
-		private CustomerItem _participant;
+		private ParticipantItem _participant;
 
 		public CommentCellView (string cellId) : base (UITableViewCellStyle.Default, cellId)
 		{
@@ -38,9 +38,9 @@ namespace gogogoClientiOS.Views
 			_headingLabel.Text = _participant.Name;
 		}
 
-		public void UpdateCell (string messageText, CustomerItem participant, UIImage userImage)
+		public void UpdateCell (string messageText, ParticipantItem participant, UIImage userImage)
 		{
-			_participant = participant ?? CustomerItem.NullCustomer ();
+			_participant = participant ?? ParticipantItem.NullCustomer ();
 
 			_imageView.Image = userImage;
 			UpdateParticipantInfo (participant.Name);

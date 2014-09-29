@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Caliburn.Micro;
+using System.Threading.Tasks;
 using gogogoClientiOS.BusinessService;
 using gogogoClientiOS.Model;
-using gogogoClientiOS.Model.Messages;
 using gogogoClientiOS.Tools;
 using gogogoClientiOS.Views;
 using MonoTouch.Foundation;
@@ -11,7 +10,7 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.ViewControllers
 {
-	public class EventsListViewController : UITableViewController, IHandle<ItemsChangedMessage<EventItem>>
+	public sealed class EventsListViewController : UITableViewController
 	{
 		public List<EventItem> EventItems { get; private set; } 
 
@@ -23,13 +22,6 @@ namespace gogogoClientiOS.ViewControllers
 
 			TableView.SeparatorStyle = UITableViewCellSeparatorStyle.None;
 			TableView.Source = new EventsListTableSource (this);
-		}
-
-		public virtual new void Handle(ItemsChangedMessage<EventItem> message)
-		{
-			InvokeOnMainThread (() => {
-				Refresh ();
-			});
 		}
 
 		public override void LoadView ()
@@ -44,29 +36,57 @@ namespace gogogoClientiOS.ViewControllers
 			NavigationController.SetNavigationBarHidden (true, true);
 		}
 
-		public override void ViewDidLoad ()
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			Refresh ();
+            EventService.GetInstance().Init();
+            await EventService.GetInstance().InitializeStoreAsync();
+		    await RefreshAsync();
+            AddRefreshControl();
 		}
 
-		void Refresh ()
+        private void AddRefreshControl()
+        {
+            if (!UIDevice.CurrentDevice.CheckSystemVersion(6, 0)) return;
+            // the refresh control is available, let's add it
+            RefreshControl = new UIRefreshControl();
+            RefreshControl.ValueChanged += async (sender, e) =>
+            {
+                await RefreshAsync();
+            };
+        }
+
+        private bool _isLoading;
+        private async Task RefreshAsync()
 		{
-			try {
-				EventItems.Clear ();
-				EventItems.AddRange (EventService.GetInstance ().GetItems ());
-				TableView.ReloadData ();
-			} catch (Exception ex)
-			{
-
-			}
-		}
-
+		    if (_isLoading)
+		        return;
+            _isLoading = true;
+            if (RefreshControl != null)
+                RefreshControl.BeginRefreshing();
+		    try
+		    {
+		        await EventService.GetInstance().SyncAsync();
+		        EventItems.Clear();
+		        EventItems.AddRange(await EventService.GetInstance().GetItems());
+                TableView.ReloadData();
+		    }
+		    catch (Exception ex)
+		    {
+		        Console.WriteLine(ex.Message);   
+		    }
+		    finally
+		    {
+                _isLoading = false;
+                if (RefreshControl != null)
+                    RefreshControl.EndRefreshing();
+            }
+        }
 	}
 
 	public class EventsListTableSource : UITableViewSource {
-		string cellIdentifier = "CustomEventTableCell";
-		private EventsListViewController _parentController;
+	    private const string CellIdentifier = "CustomEventTableCell";
+	    private readonly EventsListViewController _parentController;
 		public EventsListTableSource (EventsListViewController parentController)
 		{
 			_parentController = parentController;
@@ -76,20 +96,16 @@ namespace gogogoClientiOS.ViewControllers
 			return _parentController.EventItems.Count;
 		}
 
-		public override UITableViewCell GetCell (UITableView tableView, MonoTouch.Foundation.NSIndexPath indexPath)
+		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			EventCellView cell = tableView.DequeueReusableCell (cellIdentifier) as EventCellView;
+			var cell = tableView.DequeueReusableCell (CellIdentifier) as EventCellView ?? new EventCellView (CellIdentifier);
 
-			if (cell == null) {
-				cell = new EventCellView (cellIdentifier);
-			}
-
-			var eventItem = indexPath.Row < _parentController.EventItems.Count ? 
+		    var eventItem = indexPath.Row < _parentController.EventItems.Count ? 
 				_parentController.EventItems [indexPath.Row] : EventItem.NullEvent ();
 
 			cell.UpdateCell (eventItem.Name
 				, "Братеево, 14 сентября, 20:00"
-				, Converters.FromBase64(eventItem.Image));
+				, Converters.FromBase64(eventItem.ShortImage));
 
 			return cell;
 		}
@@ -101,7 +117,11 @@ namespace gogogoClientiOS.ViewControllers
 
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
-			AppDelegate.Shared.ShowEventDetails (_parentController.EventItems [indexPath.Row].Id);
+		    var selectedItem = indexPath.Row < _parentController.EventItems.Count
+		        ? _parentController.EventItems[indexPath.Row]
+		        : EventItem.NullEvent();
+
+            AppDelegate.Shared.ShowEventDetails(selectedItem);
 		}
 	}
 }

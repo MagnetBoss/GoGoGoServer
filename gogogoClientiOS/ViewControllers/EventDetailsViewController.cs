@@ -1,7 +1,5 @@
 ﻿using System.Drawing;
-using Caliburn.Micro;
 using gogogoClientiOS.Model;
-using gogogoClientiOS.Model.Messages;
 using gogogoClientiOS.Tools;
 using gogogoClientiOS.Views;
 using MonoTouch.Foundation;
@@ -9,33 +7,27 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.ViewControllers
 {
-	public class EventDetailsViewController : UIViewController, IHandle<ItemsChangedMessage<EventItem>>
-	{
-		private EventDetailsView _contentView;
+	public sealed class EventDetailsViewController : UIViewController	{
+		private readonly EventDetailsView _contentView;
 		private UIScrollView _scrollView;
 		private float _keyboardOffset = 0;
-		private EventItem _currentEvent;
 
-		public EventDetailsViewController (EventItem eventItem)
+	    public EventDetailsViewController (EventItem eventItem)
 		{
-			AutomaticallyAdjustsScrollViewInsets = false;
+		    AutomaticallyAdjustsScrollViewInsets = false;
 
-			_currentEvent = eventItem ?? EventItem.NullEvent();
-			_contentView = new EventDetailsView (this);
-			_contentView.Image = Converters.FromBase64 (_currentEvent.DescriptionImage);
-			_contentView.Name = _currentEvent.Name;
-			_contentView.LocationDescription = "Стадион школы №1037";
-			_contentView.Date = _currentEvent.Date.ToString ("dd.MM");
-			_contentView.Time = "в " + _currentEvent.Date.ToString ("hh:mm");
-			_contentView.ParticipantsCount = _currentEvent.CurCustomers.ToString ();
-			_contentView.ParticipantCountWord = "участника";
-			_contentView.DescriptionText = _currentEvent.Description;
-		}
-
-		public virtual new void Handle(ItemsChangedMessage<EventItem> message)
-		{
-			InvokeOnMainThread (() => {
-			});
+			EventItem currentEvent = eventItem ?? EventItem.NullEvent();
+			_contentView = new EventDetailsView (this)
+			{
+			    Image = Converters.FromBase64(currentEvent.LargeImage),
+			    Name = currentEvent.Name,
+			    LocationDescription = "Стадион школы №1037",
+			    Date = currentEvent.Date.ToString("dd.MM"),
+			    Time = "в " + currentEvent.Date.ToString("hh:mm"),
+			    ParticipantsCount = 2.ToString(),
+			    ParticipantCountWord = "участника",
+			    DescriptionText = currentEvent.Description
+			};
 		}
 
 		public override void ViewDidLayoutSubviews ()

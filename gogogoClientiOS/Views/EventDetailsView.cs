@@ -3,18 +3,18 @@ using MonoTouch.UIKit;
 
 namespace gogogoClientiOS.Views
 {
-	public class EventDetailsView : UIView
+	public sealed class EventDetailsView : UIView
 	{
-		private UIImageView _imageView;
-		private UILabel _nameLabel;
-		private UILabel _locationDescriptionLabel;
-		private UILabel _dateLabel;
-		private UILabel _timeLabel;
-		private UIButton _goButton;
-		private UILabel _participantsCountLabel;
-		private UILabel _participantsCountWordLabel;
-		private UILabel _descriptionlabel;
-		private EventDetailsViewController _controller;
+		private readonly UIImageView _imageView;
+		private readonly UILabel _nameLabel;
+		private readonly UILabel _locationDescriptionLabel;
+		private readonly UILabel _dateLabel;
+		private readonly UILabel _timeLabel;
+		private readonly UIButton _goButton;
+		private readonly UILabel _participantsCountLabel;
+		private readonly UILabel _participantsCountWordLabel;
+		private readonly UILabel _descriptionlabel;
+		private readonly EventDetailsViewController _controller;
 
 		public EventDetailsView (EventDetailsViewController controller)
 		{
@@ -23,32 +23,40 @@ namespace gogogoClientiOS.Views
 		
 			BackgroundColor = UIColor.White;
 			_imageView = new UIImageView ();
-			_nameLabel = new UILabel ();
-			_nameLabel.Font = UIFont.FromName ("HelveticaNeue-Medium", 15f);
-			_locationDescriptionLabel = new UILabel ();
-			_locationDescriptionLabel.Font = UIFont.FromName ("HelveticaNeue-Light", 12f);
-			_dateLabel = new UILabel ();
-			_dateLabel.Font = UIFont.FromName ("HelveticaNeue-Medium", 15f); 
-			_dateLabel.TextAlignment = UITextAlignment.Center;
-			_timeLabel = new UILabel ();
-			_timeLabel.Font = UIFont.FromName ("HelveticaNeue-Light", 13f); 
-			_timeLabel.TextAlignment = UITextAlignment.Center;
-			_goButton = UIButton.FromType (UIButtonType.RoundedRect);
+			_nameLabel = new UILabel {Font = UIFont.FromName("HelveticaNeue-Medium", 15f)};
+		    _locationDescriptionLabel = new UILabel {Font = UIFont.FromName("HelveticaNeue-Light", 12f)};
+		    _dateLabel = new UILabel
+			{
+			    Font = UIFont.FromName("HelveticaNeue-Medium", 15f),
+			    TextAlignment = UITextAlignment.Center
+			};
+		    _timeLabel = new UILabel
+		    {
+		        Font = UIFont.FromName("HelveticaNeue-Light", 13f),
+		        TextAlignment = UITextAlignment.Center
+		    };
+		    _goButton = UIButton.FromType (UIButtonType.RoundedRect);
 			_goButton.SetTitle ("Я пойду!", UIControlState.Normal);
 			_goButton.BackgroundColor = UIColor.FromRGB (240, 240, 240);
-			_participantsCountLabel = new UILabel ();
-			_participantsCountLabel.Font = UIFont.FromName ("HelveticaNeue-Bold", 25f); 
-			_participantsCountLabel.TextColor = UIColor.Red;
-			_participantsCountLabel.TextAlignment = UITextAlignment.Center;
-			_participantsCountWordLabel = new UILabel ();
-			_participantsCountWordLabel.Font = UIFont.FromName ("HelveticaNeue-Light", 13f); 
-			_participantsCountWordLabel.TextAlignment = UITextAlignment.Center;
-			_descriptionlabel = new UILabel ();
-			_descriptionlabel.Font = UIFont.FromName ("HelveticaNeue-Light", 14f); 
-			_descriptionlabel.LineBreakMode = UILineBreakMode.WordWrap;
-			_descriptionlabel.Lines = 0;
+			_participantsCountLabel = new UILabel
+			{
+			    Font = UIFont.FromName("HelveticaNeue-Bold", 25f),
+			    TextColor = UIColor.Red,
+			    TextAlignment = UITextAlignment.Center
+			};
+		    _participantsCountWordLabel = new UILabel
+		    {
+		        Font = UIFont.FromName("HelveticaNeue-Light", 13f),
+		        TextAlignment = UITextAlignment.Center
+		    };
+		    _descriptionlabel = new UILabel
+		    {
+		        Font = UIFont.FromName("HelveticaNeue-Light", 14f),
+		        LineBreakMode = UILineBreakMode.WordWrap,
+		        Lines = 0
+		    };
 
-			Add (_imageView);
+		    Add (_imageView);
 			Add (_nameLabel);
 			Add (_locationDescriptionLabel);
 			Add (_dateLabel);
@@ -83,8 +91,6 @@ namespace gogogoClientiOS.Views
 				return _imageView.Image;
 			}
 			set {
-				if (_imageView.Image == value)
-					return;
 				_imageView.Image = value;
 			}
 		}
@@ -94,8 +100,6 @@ namespace gogogoClientiOS.Views
 				return _nameLabel.Text;
 			}
 			set {
-				if (_nameLabel.Text == value)
-					return;
 				_nameLabel.Text = value;
 			}
 		}
@@ -105,8 +109,6 @@ namespace gogogoClientiOS.Views
 				return _locationDescriptionLabel.Text;
 			}
 			set {
-				if (_locationDescriptionLabel.Text == value)
-					return;
 				_locationDescriptionLabel.Text = value;
 			}
 		}
@@ -116,8 +118,6 @@ namespace gogogoClientiOS.Views
 				return _dateLabel.Text;
 			}
 			set {
-				if (_dateLabel.Text == value)
-					return;
 				_dateLabel.Text = value;
 			}
 		}
@@ -127,8 +127,6 @@ namespace gogogoClientiOS.Views
 				return _timeLabel.Text;
 			}
 			set {
-				if (_timeLabel.Text == value)
-					return;
 				_timeLabel.Text = value;
 			}
 		}
@@ -138,8 +136,6 @@ namespace gogogoClientiOS.Views
 				return _participantsCountLabel.Text;
 			}
 			set {
-				if (_participantsCountLabel.Text == value)
-					return;
 				_participantsCountLabel.Text = value;
 			}
 		}
@@ -149,8 +145,6 @@ namespace gogogoClientiOS.Views
 				return _participantsCountWordLabel.Text;
 			}
 			set {
-				if (_participantsCountWordLabel.Text == value)
-					return;
 				_participantsCountWordLabel.Text = value;
 			}
 		}
